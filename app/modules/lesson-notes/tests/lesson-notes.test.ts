@@ -113,6 +113,6 @@ describe("describeNoteDraft", () => {
   it("does not allow saving a cleared note, which the server would reject", () => {
     const state = describeNoteDraft({ ...base, savedBody: "old", draft: "  " });
     expect(state.canSave).toBe(false);
-    expect(state.status).toEqual({ kind: "unsaved" });
+    expect(state.status).toEqual({ kind: "blank" });
   });
 });

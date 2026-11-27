@@ -11,6 +11,7 @@ export type NoteDraftStatus =
   | { kind: "error"; message: string }
   | { kind: "saving" }
   | { kind: "over-limit" }
+  | { kind: "blank" }
   | { kind: "unsaved" }
   | { kind: "saved" }
   | { kind: "empty" };
@@ -38,7 +39,7 @@ export function describeDraft(input: NoteDraftInput): NoteDraftState {
     max: MAX_NOTE_LENGTH,
     overLimit,
     canSave: changed && !blank && !overLimit && !saving,
-    status: statusOf({ saving, error, overLimit, changed, savedBody }),
+    status: statusOf({ saving, error, overLimit, blank, changed, savedBody }),
   };
 }
 
@@ -46,12 +47,14 @@ function statusOf({
   saving,
   error,
   overLimit,
+  blank,
   changed,
   savedBody,
 }: {
   saving: boolean;
   error: string | undefined;
   overLimit: boolean;
+  blank: boolean;
   changed: boolean;
   savedBody: string | null;
 }): NoteDraftStatus {
@@ -59,6 +62,8 @@ function statusOf({
   // A server error describes the last submit; once the draft moves on it may no longer apply.
   if (error && changed) return { kind: "error", message: error };
   if (overLimit) return { kind: "over-limit" };
+  // The server rejects a blank note and has no delete, so a cleared note cannot be saved.
+  if (blank && changed) return { kind: "blank" };
   if (changed) return { kind: "unsaved" };
   return savedBody === null ? { kind: "empty" } : { kind: "saved" };
 }

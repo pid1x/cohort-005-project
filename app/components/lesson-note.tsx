@@ -78,6 +78,12 @@ function NoteStatus({
           Too long to save. Trim it down first.
         </span>
       );
+    case "blank":
+      return (
+        <span className="text-xs text-muted-foreground">
+          Write something to save your note.
+        </span>
+      );
     case "unsaved":
       return (
         <span className="text-xs text-muted-foreground">Unsaved changes</span>
